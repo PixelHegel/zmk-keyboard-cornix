@@ -3,6 +3,9 @@
 include:
   - board: cornix_left//zmk
     artifact-name: cornix_left
+  - board: cornix_left//zmk
+    snippet: zmk-usb-logging
+    artifact-name: cornix_left_usblog
   - board: cornix_right//zmk
     artifact-name: cornix_right
   - board: cornix_right//zmk
