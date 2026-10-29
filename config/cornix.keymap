@@ -144,38 +144,23 @@
             bindings = <&kp N0>, <&kp N0>, <&kp N0>;
         };  // 000
 
-        // One key = switch host. Sequence (2026-10-29 rewrite, see README "切机宏时序"):
-        //   1. to the CURRENT host: Ctrl+Alt+F1x (monitor -> target) and Ctrl+Alt+F17 (release trackpad)
-        //   2. wait >=300 ms so the RELEASE reports reach that host BEFORE the profile switch
-        //      (ZMK sends HID over BLE asynchronously and keeps the old host connected, so a
-        //      release that is still queued when &bt BT_SEL runs goes to the new host and the
-        //      old host is left with Ctrl+Alt+F1x held down forever -> 2026-10-29 incident)
-        //   3. &bt BT_SEL n, then to the NEW host: Ctrl+Alt+F16 (take trackpad), then layer.
-        // NOTE: wait-ms is attached to the release of the preceding binding.
+        // Host switch = Bluetooth profile + layer only. No key presses are sent to either host:
+        // a report queued right before &bt BT_SEL lands on the NEW host and leaves the old host
+        // with keys held forever (2026-10-29 incident). Monitor switching stays on the Fun layer
+        // (plain taps) or is done from the host side.
         to_mac: to_mac {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            wait-ms = <60>;
-            tap-ms = <50>;
-            bindings
-                = <&kp LC(LA(F14))>
-                , <&macro_wait_time 400>, <&kp LC(LA(F17))>
-                , <&macro_wait_time 150>, <&bt BT_SEL 1>
-                , <&kp LC(LA(F16))>
-                , <&to MAC>;
+            wait-ms = <0>;
+            bindings = <&bt BT_SEL 1>, <&to MAC>;
         };
         to_linux: to_linux {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            wait-ms = <60>;
-            tap-ms = <50>;
-            bindings
-                = <&kp LC(LA(F13))>
-                , <&macro_wait_time 400>, <&kp LC(LA(F17))>
-                , <&macro_wait_time 150>, <&bt BT_SEL 0>
-                , <&kp LC(LA(F16))>
-                , <&to BASE>;
+            wait-ms = <0>;
+            bindings = <&bt BT_SEL 0>, <&to BASE>;
         };
+    };
     };
     };
 
