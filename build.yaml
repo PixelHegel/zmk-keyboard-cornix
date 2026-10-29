@@ -2,6 +2,7 @@
 ---
 include:
   - board: cornix_left//zmk
+    snippet: studio-rpc-usb-uart   # ZMK Studio over USB (WebSerial); no snippet = Studio only over BLE
     artifact-name: cornix_left
   - board: cornix_left//zmk
     snippet: zmk-usb-logging
