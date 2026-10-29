@@ -12,3 +12,7 @@ include:
     shield: settings_reset
     snippet: nrf52840-nosd
     artifact-name: cornix_reset
+  - board: cornix_left//zmk
+    shield: settings_reset
+    snippet: nrf52840-nosd
+    artifact-name: cornix_reset_left
