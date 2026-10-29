@@ -144,19 +144,39 @@
             bindings = <&kp N0>, <&kp N0>, <&kp N0>;
         };  // 000
 
-        // one key = monitor to Mac (Ctrl+Alt+F14 to the current host), then BT profile 1, then Mac layer
+        // One key = switch host. Sequence (2026-10-29 rewrite, see README "切机宏时序"):
+        //   1. to the CURRENT host: Ctrl+Alt+F1x (monitor -> target) and Ctrl+Alt+F17 (release trackpad)
+        //   2. wait >=300 ms so the RELEASE reports reach that host BEFORE the profile switch
+        //      (ZMK sends HID over BLE asynchronously and keeps the old host connected, so a
+        //      release that is still queued when &bt BT_SEL runs goes to the new host and the
+        //      old host is left with Ctrl+Alt+F1x held down forever -> 2026-10-29 incident)
+        //   3. &bt BT_SEL n, then to the NEW host: Ctrl+Alt+F16 (take trackpad), then layer.
+        // NOTE: wait-ms is attached to the release of the preceding binding.
         to_mac: to_mac {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            wait-ms = <0>;
-            bindings = <&kp LC(LA(F14))>, <&macro_wait_time 300>, <&bt BT_SEL 1>, <&to MAC>;
+            wait-ms = <60>;
+            tap-ms = <50>;
+            bindings
+                = <&kp LC(LA(F14))>
+                , <&macro_wait_time 400>, <&kp LC(LA(F17))>
+                , <&macro_wait_time 150>, <&bt BT_SEL 1>
+                , <&kp LC(LA(F16))>
+                , <&to MAC>;
         };
         to_linux: to_linux {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
-            wait-ms = <0>;
-            bindings = <&kp LC(LA(F13))>, <&macro_wait_time 300>, <&bt BT_SEL 0>, <&to BASE>;
+            wait-ms = <60>;
+            tap-ms = <50>;
+            bindings
+                = <&kp LC(LA(F13))>
+                , <&macro_wait_time 400>, <&kp LC(LA(F17))>
+                , <&macro_wait_time 150>, <&bt BT_SEL 0>
+                , <&kp LC(LA(F16))>
+                , <&to BASE>;
         };
+    };
     };
 
     conditional_layers {
@@ -233,7 +253,7 @@
         fun_layer {
             display-name = "Fun";
             bindings = <
-                &kp LC(LA(F13))  &m_email_p  &m_email_w  &kp LC(LA(F16))  &kp LC(LA(F17))  &none  &kp F12  &kp F7  &kp F8  &kp F9  &none  &bootloader
+                &kp LC(LA(F13))  &m_email_p  &m_email_w  &kp LC(LA(F16))  &kp LC(LA(F17))  &studio_unlock  &kp F12  &kp F7  &kp F8  &kp F9  &none  &bootloader
                 &kp LC(LA(F14))  &kp LALT  &kp LCTRL  &kp LGUI  &kp LSHFT  &none  &kp F11  &kp F4  &kp F5  &kp F6  &none  &none
                 &kp LC(LA(F15))  &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_CLR  &none  &kp C_MUTE  &mkp MCLK  &kp F10  &kp F1  &kp F2  &kp F3  &none  &none
                 &none  &none  &none  &trans  &none  &none  &none  &none  &none  &none  &none  &none
